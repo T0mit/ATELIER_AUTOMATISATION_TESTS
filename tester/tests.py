@@ -3,13 +3,22 @@ def run_all_tests(client):
 
     # Test 1 : GET /random returns 200 OK and valid JSON
     res1 = client.request("GET", "/random")
-    t1_pass = (res1["status_code"] == 200 and 
-               res1["headers"].get("content-type", "").startswith("application/json"))
+    
+    # On cherche 'content-type' peu importe la casse des majuscules/minuscules
+    content_type = ""
+    for k, v in res1.get("headers", {}).items():
+        if k.lower() == "content-type":
+            content_type = v.lower()
+            break
+
+    # Le test passe si le code est 200 ET que 'application/json' est dans le content-type
+    t1_pass = (res1["status_code"] == 200 and "application/json" in content_type)
+    
     results.append({
         "name": "GET /random - Status 200 & Content-Type JSON",
         "status": "PASS" if t1_pass else "FAIL",
         "latency_ms": res1["latency_ms"],
-        "details": f"Status: {res1['status_code']}" if t1_pass else f"Error/Status: {res1.get('error') or res1['status_code']}"
+        "details": f"Status 200 & JSON ({content_type})" if t1_pass else f"Status: {res1['status_code']} | Content-Type: '{content_type}'"
     })
 
     # Test 2 : GET /random - Schema validation
