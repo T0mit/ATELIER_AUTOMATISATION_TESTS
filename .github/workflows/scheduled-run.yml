@@ -1,0 +1,22 @@
+name: Scheduled Test Run
+
+on:
+  schedule:
+    # S'exécute toutes les 30 minutes (ex: 00h00, 00h30, 01h00, etc.)
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Permet aussi de le déclencher à la main depuis l'onglet Actions de GitHub
+
+jobs:
+  trigger-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger /run on PythonAnywhere
+        shell: bash
+        run: |
+          DOMAIN="${{ secrets.PA_WEBAPP_DOMAIN }}"
+          echo "Sending /run request to https://${DOMAIN}/run"
+          
+          # Appelle l'endpoint /run et affiche la réponse
+          response=$(curl -sS --fail "https://${DOMAIN}/run")
+          echo "Response: ${response}"
