@@ -1,5 +1,9 @@
 import requests
 import time
+import urllib3
+
+# Désactive les avertissements visuels dans la console concernant SSL non vérifié
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class APIClient:
     def __init__(self, base_url="https://api.quotable.io", timeout=4.0):
@@ -21,7 +25,8 @@ class APIClient:
                     url=url,
                     params=params,
                     headers=headers,
-                    timeout=self.timeout
+                    timeout=self.timeout,
+                    verify=False  # <--- IGNORER L'EXPIRATION DU CERTIFICAT SSL
                 )
                 latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
                 
