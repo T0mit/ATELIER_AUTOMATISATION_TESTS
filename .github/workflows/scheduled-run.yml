@@ -2,8 +2,8 @@ name: Scheduled Test Run
 
 on:
   schedule:
-    # S'exécute toutes les 30 minutes (ex: 00h00, 00h30, 01h00, etc.)
-    - cron: '*/30 * * * *'
+    # S'exécute toutes les 5 minutes
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Permet aussi de le déclencher à la main depuis l'onglet Actions de GitHub
 
 jobs:
