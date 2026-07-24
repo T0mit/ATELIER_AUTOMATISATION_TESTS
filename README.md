@@ -2,7 +2,7 @@
 🎯Atelier “Testing as Code & API Monitoring”
 ------------------------------------------------------------------------------------------------------
 Aujourd’hui, vous allez passer du rôle de développeur au rôle d’ingénieur qualité.  
-  
+TEST  
 Internet est rempli d’API publiques : météo, devises, citations, géolocalisation, données statistiques…
 Mais une API, ce n’est pas juste une URL qui répond. C’est un service.
 Et un service doit être fiable, mesurable et surveillé.  
