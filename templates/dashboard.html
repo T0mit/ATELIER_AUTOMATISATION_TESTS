@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>QoS & Test Dashboard — Quotable API</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px; }
+        .metric { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; text-align: center; }
+        .metric-value { font-size: 24px; font-weight: bold; margin-top: 5px; color: #1e293b; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 12px; display: inline-block; }
+        .badge-pass { background: #dcfce7; color: #166534; }
+        .badge-fail { background: #fee2e2; color: #991b1b; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background: #f8fafc; }
+        .btn { background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 14px; }
+        .btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Dashboard QoS — Quotable API</h1>
+            <div>
+                <a href="/run" class="btn">⚡ Déclencher un Run</a>
+                <a href="/health" class="btn" style="background:#059669;">🏥 /health</a>
+                <a href="/api/runs/latest/json" class="btn" style="background:#475569;">📥 Export JSON</a>
+            </div>
+        </div>
+
+        {% if latest %}
+        <div class="card">
+            <h2>Dernier Run <span style="font-size: 14px; color: #64748b;">({{ latest.timestamp }})</span></h2>
+            <div class="grid">
+                <div class="metric">
+                    <div>Tests Réussis</div>
+                    <div class="metric-value" style="color: #166534;">{{ latest.summary.passed }} / {{ latest.summary.passed + latest.summary.failed }}</div>
+                </div>
+                <div class="metric">
+                    <div>Taux d'erreur</div>
+                    <div class="metric-value" style="color: {{ '#991b1b' if latest.summary.error_rate > 0 else '#166534' }};">
+                        {{ (latest.summary.error_rate * 100)|round(1) }}%
+                    </div>
+                </div>
+                <div class="metric">
+                    <div>Latence Moyenne</div>
+                    <div class="metric-value">{{ latest.summary.latency_ms_avg }} ms</div>
+                </div>
+                <div class="metric">
+                    <div>Latence P95</div>
+                    <div class="metric-value">{{ latest.summary.latency_ms_p95 }} ms</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px;">Détails des tests</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom du test</th>
+                        <th>Statut</th>
+                        <th>Latence</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in latest.tests %}
+                    <tr>
+                        <td><strong>{{ test.name }}</strong></td>
+                        <td>
+                            <span class="badge {{ 'badge-pass' if test.status == 'PASS' else 'badge-fail' }}">
+                                {{ test.status }}
+                            </span>
+                        </td>
+                        <td>{{ test.latency_ms }} ms</td>
+                        <td>{{ test.details }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card">
+            <p>Aucun test enregistré. Cliquez sur "Déclencher un Run" pour commencer.</p>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>Historique des Runs ({{ runs|length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Horodatage</th>
+                        <th>Réussis / Échoués</th>
+                        <th>Taux d'erreur</th>
+                        <th>Latence Avg</th>
+                        <th>Latence P95</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in runs %}
+                    <tr>
+                        <td>#{{ r.id }}</td>
+                        <td>{{ r.timestamp }}</td>
+                        <td>{{ r.summary.passed }} / {{ r.summary.passed + r.summary.failed }}</td>
+                        <td>{{ (r.summary.error_rate * 100)|round(1) }}%</td>
+                        <td>{{ r.summary.latency_ms_avg }} ms</td>
+                        <td>{{ r.summary.latency_ms_p95 }} ms</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
